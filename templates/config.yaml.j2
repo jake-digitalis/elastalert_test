@@ -1,0 +1,21 @@
+---
+rules_folder: /etc/elastalert/rules
+
+# Frequency elastalert queries elasticsearch
+run_every:
+  minutes: 5
+# Buffers results from most recent period of time
+buffer_time:
+  minutes: 45
+
+es_host: {{ elastalert_es_host }}
+es_port: {{ elastalert_es_port }}
+
+# Change to "elastalert" or "elastalert_status" based on es ver.
+writeback_index: elastalert_status
+
+# If alert fails, will retry during this time period
+alert_time_limit:
+  days: 2
+
+# max_query_size: 10000

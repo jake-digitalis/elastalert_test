@@ -1,0 +1,17 @@
+---
+# From example_rules/example_frequency.yaml
+es_host: {{ elastalert_es_host }}
+es_port: {{ elastalert_es_port }}
+name: test
+type: frequency
+index: filebeat-*
+num_events: 1
+timeframe:
+    minutes: 2
+filter:
+- term:
+    message: "digitalis.io"
+alert:
+- "hipchat"
+hipchat_auth_token: qD1L7xvzqG6q4TWE4x8QhMUDQKlAWrWheX1f0Kmn
+hipchat_room_id: "3417187"

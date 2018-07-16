@@ -1,0 +1,12 @@
+[Unit]
+Description=elastalert
+After=multi-user.target
+
+[Service]
+Type=simple
+WorkingDirectory={{ elastalert_etc_root }}
+ExecStart={{ elastalert_venv_rootdir }}/venv/bin/elastalert
+User={{ elastalert_user }}
+
+[Install]
+WantedBy=multi-user.target
