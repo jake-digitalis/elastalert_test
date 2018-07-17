@@ -74,9 +74,9 @@
         url: "{{ elastalert_es_url }}/{{ elastalert_es_writeback_index }}"
         method: HEAD
         status_code: 200
-        register: elastalert_index_result
-        changed_when: false
-        ignore_errors: yes
+      register: elastalert_index_result
+      changed_when: false
+      ignore_errors: yes
 
     - name: Create index
       command: "/opt/elastalert/venv/bin/elastalert-create-index --config /etc/elastalert/config.yaml --index {{ elastalert_es_writeback_index }} --old-index ''"
