@@ -71,7 +71,7 @@
 
     - name: Check for existing elastalert index
       uri:
-        url: "{{ elastalert_es_url }}/{{ elastalert_es_writeback_index }}"
+        url: "{{ elastalert_es_url }}/elastalert"
         method: HEAD
         status_code: 200
       register: elastalert_index_result
