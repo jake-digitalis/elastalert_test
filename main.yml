@@ -63,8 +63,10 @@
 
     - name: Install elastalert config
       template:
-        src: /templates/elastalert/config.yaml.j2
-        dest: "/etc/elastalert/config.yaml"
+        src: /templates/elastalert/{{ item }}.yaml.j2
+        dest: "/etc/elastalert/{{ item }}.yaml"
+      with_items:
+        - config
       notify: restart elastalert
 
     - name: Check for existing elastalert index
