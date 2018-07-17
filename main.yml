@@ -59,6 +59,7 @@
         owner: root
         group: root
       notify: reload systemd
+      tags: systemd
 
     - name: Install core elastalert config
       template:
