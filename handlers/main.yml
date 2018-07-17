@@ -5,6 +5,4 @@
     daemon_reload: yes
 
 - name: restart elastalert
-  service:
-    name: elastalert
-    state: restarted
+  service: name=elastalert state=restarted
