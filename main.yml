@@ -5,11 +5,12 @@
   become: true
 
   pre_tasks:
-    - name: create elastalert group
-      group: name="{{ elastalert_group }}" state=present
 
     - name: create elastic user
       user: name="{{ elastalert_user }}" shell=/bin/bash groups="{{ elastalert_group }}" append=yes
+
+    - name: create elastalert group
+      group: name="{{ elastalert_group }}" state=present
 
     - name: Ensure pre-reqs installed
       package:
