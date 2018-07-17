@@ -61,7 +61,7 @@
       notify: reload systemd
       tags: systemd
 
-    - name: Install core elastalert config
+    - name: Install elastalert config
       template:
         src: /templates/elastalert/config.yaml.j2
         dest: "/etc/elastalert/config.yaml"
