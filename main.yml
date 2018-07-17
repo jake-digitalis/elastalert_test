@@ -93,13 +93,13 @@
 
     - name: Copy over rules from templates
       template:
-        src: "templates/elastalert/{{ item }}.j2"
-        dest: "/etc/elastalert/rules/{{ item }}"
+        src: "templates/elastalert/{{ item }}.yaml.j2"
+        dest: "/etc/elastalert/rules/{{ item }}.yaml"
         owner: root
         group: root
         validate: "/opt/elastalert/venv/bin/elastalert-test-rule --config /etc/elastalert/config.yaml %s"
       with_items:
-        - test.yaml
+        - test
       notify: restart elastalert
 
     - name: Enable elastalert service
