@@ -32,13 +32,13 @@
         group: "{{ elastalert_group }}"
         state: directory
 
-    - name: Establish venv and ensure pip is at leas version
+    - name: Establish venv and ensure pip is at latest version
       pip:
         name: "{{ item }}"
         state: latest
         virtualenv: "/opt/elastalert/venv"
-        become: yes
-        become_user: "{{ elastalert_user }}"
+      become: yes
+      become_user: "{{ elastalert_user }}"
       with_items:
         - pip
         - setuptools
