@@ -25,4 +25,4 @@ elastalert_pkgs:
 
 # System installation settings
 elastalert_user: elastalert
-elastalert_group: elastalert
+elastalert_group: "{{ elastalert_user }}"
