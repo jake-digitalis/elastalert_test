@@ -48,8 +48,8 @@
         name: elastalert
         version: "{{ elastalert_version }}"
         virtualenv: "/opt/elastalert/venv"
-        become_user: "{{ elastalert_user }}"
-        become: yes
+      become_user: "{{ elastalert_user }}"
+      become: yes
 
   post_tasks:
 
