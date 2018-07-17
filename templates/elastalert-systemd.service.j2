@@ -4,8 +4,8 @@ After=multi-user.target
 
 [Service]
 Type=simple
-WorkingDirectory={{ elastalert_etc_root }}
-ExecStart={{ elastalert_venv_rootdir }}/venv/bin/elastalert
+WorkingDirectory=/etc/elastalert
+ExecStart=/opt/elastalert/venv/bin/elastalert
 User={{ elastalert_user }}
 
 [Install]

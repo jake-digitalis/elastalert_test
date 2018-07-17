@@ -52,7 +52,6 @@
       become: yes
 
   post_tasks:
-
     - name: Install systemd unit file
       template:
         src: elastalert-systemd.service.j2
