@@ -66,6 +66,7 @@
         src: templates/elastalert/config.yaml.j2
         dest: "/etc/elastalert/config.yaml"
       notify: restart elastalert
+      tags: systemd
 
     - name: Check for existing elastalert index
       uri:
