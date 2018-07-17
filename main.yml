@@ -59,15 +59,13 @@
         dest: /lib/systemd/system/elastalert.service
         owner: root
         group: root
-        notify: reload systemd
-        tags: systemd
+      notify: reload systemd
 
     - name: Install core elastalert config
       template:
         src: /templates/elastalert/config.yaml.j2
         dest: "/etc/elastalert/config.yaml"
-        tags: systemd
-        notify: restart elastalert
+      notify: restart elastalert
 
     - name: Check for existing elastalert index
       uri:
@@ -100,7 +98,7 @@
         validate: "/opt/elastalert/venv/bin/elastalert-test-rule --config /etc/elastalert/config.yaml %s"
       with_items:
         - test.yaml
-        notify: restart elastalert
+      notify: restart elastalert
 
     - name: Enable elastalert service
       service:
