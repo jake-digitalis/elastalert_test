@@ -69,20 +69,20 @@
       notify: restart elastalert
 
 
-    - name: Check for existing elastalert index
-      uri:
-        url: "{{ elastalert_es_url }}/elastalert"
-        method: HEAD
-        status_code: 200
-      register: elastalert_index_result
-      changed_when: false
-      ignore_errors: yes
-
-    - name: Create index
-      command: "/opt/elastalert/venv/bin/elastalert-create-index --config /etc/elastalert/config.yaml --index {{ elastalert_es_writeback_index }} --old-index ''"
-      when: elastalert_index_result|failed
-      become_user: "{{ elastalert_user }}"
-      become: yes
+    # - name: Check for existing elastalert index
+    #   uri:
+    #     url: "{{ elastalert_es_url }}/elastalert"
+    #     method: HEAD
+    #     status_code: 200
+    #   register: elastalert_index_result
+    #   changed_when: false
+    #   ignore_errors: yes
+    #
+    # - name: Create index
+    #   command: "/opt/elastalert/venv/bin/elastalert-create-index --config /etc/elastalert/config.yaml --index {{ elastalert_es_writeback_index }} --old-index ''"
+    #   when: elastalert_index_result|failed
+    #   become_user: "{{ elastalert_user }}"
+    #   become: yes
 
     - name: Create rules folder
       file:
