@@ -1,76 +1,59 @@
 ---
-- name: Install elastalert
-  hosts: "{{ target }}"
-  gather_facts: True
-  become: true
+- name: Ensure pre-reqs installed
+  package:
+    name: "{{ item }}"
+  with_items:
+      - virtualenv
+      - python-dev
+      - gcc
+      - libssl-dev
 
-  pre_tasks:
-    - name: create elastalert group
-      group: name="{{ elastalert_group }}" state=present
+- name: Ensure etc directory is created
+  file:
+    path: "/etc/elastalert"
+    state: directory
 
-    - name: create elastic user
-      user: name="{{ elastalert_user }}" shell=/bin/bash groups="{{ elastalert_group }}" append=yes
-      
-  roles:
-    - oracle-jdk
+- name: Create virtualenv root directory
+  file:
+    path: "/opt/elastalert"
+    owner: "{{ elastalert_user }}"
+    group: "{{ elastalert_group }}"
+    state: directory
 
-  post_tasks:
-    - name: Ensure pre-reqs installed
-      package:
-        name: "{{ item }}"
-      with_items:
-        - virtualenv
-        - python-dev
-        - gcc
-        - libssl-dev
+- name: Establish venv and ensure pip is at latest version
+  pip:
+    name: "{{ item }}"
+    state: latest
+    virtualenv: "/opt/elastalert/venv"
+  become: yes
+  become_user: "{{ elastalert_user }}"
+  with_items:
+    - pip
+    - setuptools
 
-    - name: Ensure etc directory is created
-      file:
-        path: "/etc/elastalert"
-        state: directory
+- name: Install elastalert into virtualenv
+  pip:
+    name: elastalert
+    version: "{{ elastalert_version }}"
+    virtualenv: "/opt/elastalert/venv"
+  become_user: "{{ elastalert_user }}"
+  become: yes
 
-    - name: Create virtualenv root directory
-      file:
-        path: "/opt/elastalert"
-        owner: "{{ elastalert_user }}"
-        group: "{{ elastalert_group }}"
-        state: directory
+- name: Install systemd unit file
+  template:
+    src: templates/elastalert/elastalert-systemd.service.j2
+    dest: /lib/systemd/system/elastalert.service
+    owner: root
+    group: root
+  notify: reload systemd
+  tags: systemd
 
-    - name: Establish venv and ensure pip is at latest version
-      pip:
-        name: "{{ item }}"
-        state: latest
-        virtualenv: "/opt/elastalert/venv"
-      become: yes
-      become_user: "{{ elastalert_user }}"
-      with_items:
-        - pip
-        - setuptools
-
-    - name: Install elastalert into virtualenv
-      pip:
-        name: elastalert
-        version: "{{ elastalert_version }}"
-        virtualenv: "/opt/elastalert/venv"
-      become_user: "{{ elastalert_user }}"
-      become: yes
-
-    - name: Install systemd unit file
-      template:
-        src: templates/elastalert/elastalert-systemd.service.j2
-        dest: /lib/systemd/system/elastalert.service
-        owner: root
-        group: root
-      notify: reload systemd
-      tags: systemd
-
-    - name: Install elastalert config
-      template:
-        src: templates/elastalert/config.yaml.j2
-        dest: "/etc/elastalert/config.yaml"
-      tags: systemd
-      notify: restart elastalert
-
+- name: Install elastalert config
+  template:
+    src: templates/elastalert/config.yaml.j2
+    dest: "/etc/elastalert/config.yaml"
+  tags: systemd
+  notify: restart elastalert
 
     # - name: Check for existing elastalert index
     #   uri:
@@ -87,25 +70,26 @@
     #   become_user: "{{ elastalert_user }}"
     #   become: yes
 
-    - name: Create rules folder
-      file:
-        path: "/etc/elastalert/rules"
-        owner: root
-        group: root
-        state: directory
+- name: Create rules folder
+  file:
+    path: "/etc/elastalert/rules"
+    owner: root
+    group: root
+    state: directory
 
-    - name: Copy over rules from templates
-      template:
-        src: "templates/elastalert/{{ item }}.yaml.j2"
-        dest: "/etc/elastalert/rules/{{ item }}.yaml"
-        owner: root
-        group: root
-        validate: "/opt/elastalert/venv/bin/elastalert-test-rule --config /etc/elastalert/config.yaml %s"
-      with_items:
-        - test
-      notify: restart elastalert
+- name: Copy over rules from templates
+  template:
+    src: "templates/elastalert/{{ item }}.yaml.j2"
+    dest: "/etc/elastalert/rules/{{ item }}.yaml"
+    owner: root
+    group: root
+    validate: "/opt/elastalert/venv/bin/elastalert-test-rule --config /etc/elastalert/config.yaml %s"
+  with_items:
+    - test
+  notify: restart elastalert
+  tags: systemd
 
-    - name: Enable elastalert service
-      service:
-        name: elastalert
-        enabled: yes
+- name: Enable elastalert service
+  service:
+    name: elastalert
+    enabled: yes
