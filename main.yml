@@ -10,7 +10,11 @@
 
     - name: create elastic user
       user: name="{{ elastalert_user }}" shell=/bin/bash groups="{{ elastalert_group }}" append=yes
+      
+  roles:
+    - oracle-jdk
 
+  post_tasks:
     - name: Ensure pre-reqs installed
       package:
         name: "{{ item }}"
@@ -51,7 +55,6 @@
       become_user: "{{ elastalert_user }}"
       become: yes
 
-  post_tasks:
     - name: Install systemd unit file
       template:
         src: templates/elastalert/elastalert-systemd.service.j2

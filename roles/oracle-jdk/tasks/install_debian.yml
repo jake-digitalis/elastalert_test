@@ -1,0 +1,46 @@
+---
+- name: download oracle-jdk tar.gz
+  get_url:
+    url: "{{ oracle_jdk_tar_download_source_url }}"
+    headers: 'Cookie: oraclelicense=accept-securebackup-cookie'
+    dest: /var/tmp/{{ oracle_jdk_tar_download_filename }}
+  when: oracle_jdk_tar_local_file is undefined
+
+- name: Copy pre-download file to target
+  copy:
+    src: "{{ oracle_jdk_tar_local_file }}"
+    dest: /var/tmp/{{ oracle_jdk_tar_download_filename }}
+  when: oracle_jdk_tar_local_file is defined
+
+- name: create jdk opt directory
+  file: path=/opt/oracle-jdk state=directory
+
+- name: unarchive java tar
+  unarchive:
+    src: /var/tmp/{{ oracle_jdk_tar_download_filename }}
+    dest: /opt/oracle-jdk
+    copy: no
+    creates: /opt/oracle-jdk/jdk1.{{ oracle_jdk_version }}.0_{{ oracle_jdk_update }}
+
+- name: Update permissions
+  file: path=/opt/oracle-jdk owner=root group=root mode=0755
+
+- name: create symbolic link for java home
+  file: src=/opt/oracle-jdk/jdk1.{{ oracle_jdk_version }}.0_{{ oracle_jdk_update }} dest=/opt/java state=link
+  when: ansible_check_mode is undefined
+
+- name: Add JAVA_HOME to /etc/profile
+  lineinfile: dest=/etc/profile state=present line="JAVA_HOME=/opt/java"
+
+- name: Add JAVA_HOME/bin path to PATH
+  lineinfile: dest=/etc/profile state=present line="PATH=$JAVA_HOME/bin:$PATH"
+
+- name: correct java version selected
+  alternatives:
+    name: java
+    path: /opt/oracle-jdk/jdk1.{{ oracle_jdk_version }}.0_{{ oracle_jdk_update }}/jre/bin/java
+    link: /usr/bin/java
+
+- name: install JCE if required
+  include: install_jce.yml
+  when: oracle_install_jce

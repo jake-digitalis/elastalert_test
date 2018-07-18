@@ -1,0 +1,42 @@
+---
+
+- name: download oracle JCE to target
+  when: has_internet_access
+  get_url:
+    url: "{{ oracle_jce_download_source_url }}"
+    headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
+    dest: /var/tmp/jce.zip
+
+- name: Copy JCE to target host
+  when: "not has_internet_access"
+  copy:
+    src: "{{ oracle_jce_zip_download_filename }}"
+    dest: /var/tmp/jce.zip
+
+- name: Make sure unzip is installed (RedHat)
+  yum:
+    name: unzip
+    state: installed
+  when: ansible_os_family == "RedHat"
+
+- name: Make sure unzip is installed (Debian)
+  apt:
+    name: unzip
+    state: installed
+  when: ansible_os_family == "Debian"
+
+- name: Unzip JCE package
+  unarchive:
+    src: /var/tmp/jce.zip
+    remote_src: yes
+    dest: /var/tmp/
+  changed_when: false
+
+- name: Overwrite existing policies with JCE ones
+  copy:
+    src: /var/tmp/UnlimitedJCEPolicyJDK8/{{ item }}
+    remote_src: yes
+    dest: /opt/oracle-jdk/jdk1.{{ oracle_jdk_version }}.0_{{ oracle_jdk_update }}/jre/lib/security/{{ item }}
+  with_items:
+    - local_policy.jar
+    - US_export_policy.jar

@@ -1,0 +1,15 @@
+---
+oracle_jdk_version: 8
+oracle_jdk_update: 152
+oracle_jdk_build_number: b16
+oracle_jdk_uuid: aa0333dd3019491ca4f6ddbe78cdb6d0
+
+oracle_install_jce: false
+
+# RedHat family specific variables
+oracle_jdk_rpm_download_filename: jdk-{{ oracle_jdk_version }}u{{ oracle_jdk_update }}-linux-x64.rpm
+oracle_jdk_rpm_download_source_url: http://download.oracle.com/otn-pub/java/jdk/{{ oracle_jdk_version }}u{{ oracle_jdk_update }}-{{ oracle_jdk_build_number }}/{{ oracle_jdk_uuid }}/{{ oracle_jdk_rpm_download_filename }}
+
+# Debian family specific variables
+oracle_jdk_tar_download_filename: jdk-{{ oracle_jdk_version }}u{{ oracle_jdk_update }}-linux-x64.tar.gz
+oracle_jdk_tar_download_source_url: https://storage.gra1.cloud.ovh.net/v1/AUTH_e7d1545628ab4aff83ae4b90ee0fcaf0/digitalis-io/java/{{ oracle_jdk_tar_download_filename }}

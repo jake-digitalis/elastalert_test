@@ -1,0 +1,37 @@
+---
+- name: download oracle-jdk rpm
+  when: (has_internet_access is defined and has_internet_access == true) or has_internet_access is not defined
+  get_url:
+    url: "{{ oracle_jdk_rpm_download_source_url }}"
+    headers: 'Cookie: oraclelicense=accept-securebackup-cookie'
+    follow: true
+    dest: /tmp/{{ oracle_jdk_rpm_download_filename }}
+
+- name: Copy oracle-jdk rpm to target
+  when: has_internet_access is defined and has_internet_access == false
+  copy:
+    src: "{{ jdk_rpm_download_path }}"
+    dest: /tmp/{{ oracle_jdk_rpm_download_filename }}
+
+- name: install oracle-jdk
+  yum:
+    name: /tmp/{{ oracle_jdk_rpm_download_filename }}
+    state: present
+
+- name: configure installed java
+  alternatives:
+    name: java
+    path: /usr/java/jdk1.{{ oracle_jdk_version }}.0_{{ oracle_jdk_update }}/bin/java
+    link: /usr/bin/java
+
+- name: install JCE if required
+  include: install_jce.yml
+  when: oracle_install_jce
+
+- name: Install profile file
+  template:
+      src: java.sh.j2
+      dest: /etc/profile.d/java.sh
+      owner: root
+      group: root
+      mode: 644
