@@ -13,4 +13,4 @@
 
   roles:
     - oracle-jdk
-    - elastalert
+    # - elastalert
