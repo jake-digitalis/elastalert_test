@@ -1,6 +1,6 @@
 ---
 # General settings
-elastalert_version: 0.1.15
+elastalert_version: 0.1.33
 elastalert_alert_time_limit:
   days: 2
 elastalert_buffer_time:

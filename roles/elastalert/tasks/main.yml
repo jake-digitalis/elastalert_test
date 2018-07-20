@@ -1,95 +1,128 @@
 ---
-- name: Ensure pre-reqs installed
-  package:
+
+- name: Avoid errors that result from InsecurePlatformWarning
+  apt:
     name: "{{ item }}"
+    dest: /tmp
   with_items:
-      - virtualenv
-      - python-dev
-      - gcc
-      - libssl-dev
+    - software-properties-common
+    - python
+    - python-pip
+    - python-dev
+    - libffi-dev
+    - libssl-dev
+  tags:
+    - apt
 
-- name: Ensure etc directory is created
-  file:
-    path: "/etc/elastalert"
-    state: directory
-
-- name: Create virtualenv root directory
-  file:
-    path: "/opt/elastalert"
-    owner: "{{ elastalert_user }}"
-    group: "{{ elastalert_group }}"
-    state: directory
-
-- name: Establish venv and ensure pip is at latest version
+- name: Install virtualenv
   pip:
-    name: "{{ item }}"
-    state: latest
-    virtualenv: "/opt/elastalert/venv"
-  become: yes
-  become_user: "{{ elastalert_user }}"
-  with_items:
-    - pip
-    - setuptools
+    name: virtualenv
 
-- name: Install elastalert into virtualenv
-  pip:
-    name: elastalert
-    version: "{{ elastalert_version }}"
-    virtualenv: "/opt/elastalert/venv"
-  become_user: "{{ elastalert_user }}"
-  become: yes
 
-- name: Install systemd unit file
-  template:
-    src: templates/elastalert/elastalert-systemd.service.j2
-    dest: /lib/systemd/system/elastalert.service
-    owner: root
-    group: root
-  notify: reload systemd
-  tags: systemd
 
-- name: Install elastalert config
-  template:
-    src: templates/elastalert/config.yaml.j2
-    dest: "/etc/elastalert/config.yaml"
-  tags: systemd
-  notify: restart elastalert
 
-    # - name: Check for existing elastalert index
-    #   uri:
-    #     url: "{{ elastalert_es_url }}/elastalert"
-    #     method: HEAD
-    #     status_code: 200
-    #   register: elastalert_index_result
-    #   changed_when: false
-    #   ignore_errors: yes
-    #
-    # - name: Create index
-    #   command: "/opt/elastalert/venv/bin/elastalert-create-index --config /etc/elastalert/config.yaml --index {{ elastalert_es_writeback_index }} --old-index ''"
-    #   when: elastalert_index_result|failed
-    #   become_user: "{{ elastalert_user }}"
-    #   become: yes
-
-- name: Create rules folder
-  file:
-    path: "/etc/elastalert/rules"
-    owner: root
-    group: root
-    state: directory
-
-- name: Copy over rules from templates
-  template:
-    src: "templates/elastalert/{{ item }}.yaml.j2"
-    dest: "/etc/elastalert/rules/{{ item }}.yaml"
-    owner: root
-    group: root
-    validate: "/opt/elastalert/venv/bin/elastalert-test-rule --config /etc/elastalert/config.yaml %s"
-  with_items:
-    - test
-  notify: restart elastalert
-  tags: systemd
-
-- name: Enable elastalert service
-  service:
-    name: elastalert
-    enabled: yes
+#
+# - name: Clone elastalert repository
+#   git:
+#     repo: https://github.com/Yelp/elastalert.git
+#     accept_hostkey: yes
+#     dest: /opt/elastalert
+#     version: "{{ elastalert_version }}"
+#
+#
+#
+#
+# - name: Ensure pre-reqs installed
+#   package:
+#     name: "{{ item }}"
+#   with_items:
+#       - virtualenv
+#       - python-dev
+#       - gcc
+#       - libssl-dev
+#
+# - name: Ensure etc directory is created
+#   file:
+#     path: "/etc/elastalert"
+#     state: directory
+#
+# - name: Create virtualenv root directory
+#   file:
+#     path: "/opt/elastalert"
+#     owner: "{{ elastalert_user }}"
+#     group: "{{ elastalert_group }}"
+#     state: directory
+#
+# - name: Establish venv and ensure pip is at latest version
+#   pip:
+#     name: "{{ item }}"
+#     state: latest
+#     virtualenv: "/opt/elastalert/venv"
+#   become: yes
+#   become_user: "{{ elastalert_user }}"
+#   with_items:
+#     - pip
+#     - setuptools
+#
+# - name: Install elastalert into virtualenv
+#   pip:
+#     name: elastalert
+#     version: "{{ elastalert_version }}"
+#     virtualenv: "/opt/elastalert/venv"
+#   become_user: "{{ elastalert_user }}"
+#   become: yes
+#
+# - name: Install systemd unit file
+#   template:
+#     src: templates/elastalert/elastalert-systemd.service.j2
+#     dest: /lib/systemd/system/elastalert.service
+#     owner: root
+#     group: root
+#   notify: reload systemd
+#   tags: systemd
+#
+# - name: Install elastalert config
+#   template:
+#     src: templates/elastalert/config.yaml.j2
+#     dest: "/etc/elastalert/config.yaml"
+#   tags: systemd
+#   notify: restart elastalert
+#
+#     # - name: Check for existing elastalert index
+#     #   uri:
+#     #     url: "{{ elastalert_es_url }}/elastalert"
+#     #     method: HEAD
+#     #     status_code: 200
+#     #   register: elastalert_index_result
+#     #   changed_when: false
+#     #   ignore_errors: yes
+#     #
+#     # - name: Create index
+#     #   command: "/opt/elastalert/venv/bin/elastalert-create-index --config /etc/elastalert/config.yaml --index {{ elastalert_es_writeback_index }} --old-index ''"
+#     #   when: elastalert_index_result|failed
+#     #   become_user: "{{ elastalert_user }}"
+#     #   become: yes
+#
+# - name: Create rules folder
+#   file:
+#     path: "/etc/elastalert/rules"
+#     owner: root
+#     group: root
+#     state: directory
+#
+# - name: Copy over rules from templates
+#   template:
+#     src: "templates/elastalert/{{ item }}.yaml.j2"
+#     dest: "/etc/elastalert/rules/{{ item }}.yaml"
+#     owner: root
+#     group: root
+#     validate: "/opt/elastalert/venv/bin/elastalert-test-rule --config /etc/elastalert/config.yaml %s"
+#   with_items:
+#     - test
+#   notify: restart elastalert
+#   tags: systemd
+#
+# - name: Enable elastalert service
+#   service:
+#     name: elastalert
+#     enabled: yes
