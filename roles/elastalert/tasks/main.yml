@@ -13,24 +13,22 @@
   tags:
     - apt
 
-
-
 - name: Install virtualenv
   pip:
     name: virtualenv
 
+- name: Install setup tools
+  pip:
+    name: "setuptools>=11.3"
+
+- name: Clone elastalert repository
+  git:
+    repo: https://github.com/Yelp/elastalert.git
+    accept_hostkey: yes
+    dest: /opt/elastalert
+    version: "{{ elastalert_version }}"
 
 
-
-#
-# - name: Clone elastalert repository
-#   git:
-#     repo: https://github.com/Yelp/elastalert.git
-#     accept_hostkey: yes
-#     dest: /opt/elastalert
-#     version: "{{ elastalert_version }}"
-#
-#
 #
 #
 # - name: Ensure pre-reqs installed
