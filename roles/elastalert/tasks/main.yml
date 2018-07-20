@@ -1,8 +1,14 @@
 ---
+- name: Clone elastalert repository
+  git:
+    repo: https://github.com/Yelp/elastalert.git
+    accept_hostkey: yes
+    dest: /opt/elastalert
+    version: "{{ elastalert_version }}"
+
 - name: Avoid errors that result from InsecurePlatformWarning
   apt:
     name: "{{ item }}"
-    # dest: /tmp/
   with_items:
     - software-properties-common
     - python
@@ -21,12 +27,14 @@
   pip:
     name: "setuptools>=11.3"
 
-- name: Clone elastalert repository
-  git:
-    repo: https://github.com/Yelp/elastalert.git
-    accept_hostkey: yes
-    dest: /opt/elastalert
-    version: "{{ elastalert_version }}"
+- name: Install elastalert
+  command: /opt/elastalert/venv/bin/python setup.py install
+  args:
+    chdir: /opt/elastalert
+
+- name: Install elasticsearch-py
+  pip:
+    name: "elasticsearch>=6.3.0"
 
 
 #
