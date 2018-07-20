@@ -91,14 +91,14 @@
   with_items:
     - test
 
-# - name: Install systemd unit file
-#   template:
-#     src: templates/elastalert/elastalert-systemd.service.j2
-#     dest: /lib/systemd/system/elastalert.service
-#     owner: root
-#     group: root
-#   notify:
-#     - restart elastalert
+- name: Install systemd unit file
+  template:
+    src: templates/elastalert/elastalert-systemd.service.j2
+    dest: /lib/systemd/system/elastalert.service
+    owner: root
+    group: root
+  notify:
+    - restart elastalert
 
 # - name: Enable elastalert at startup
 #   service:
