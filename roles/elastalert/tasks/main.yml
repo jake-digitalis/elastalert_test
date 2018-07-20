@@ -100,11 +100,11 @@
   notify:
     - restart elastalert
 
-# - name: Enable elastalert at startup
-#   service:
-#     name: elastalert
-#     state: started
-#     enabled: yes
+- name: Enable elastalert at startup
+  service:
+    name: elastalert
+    state: started
+    enabled: yes
 
 
 
