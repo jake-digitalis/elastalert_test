@@ -76,8 +76,8 @@
     owner: root
     group: root
     mode: 0755
-  notify:
-    - restart elastalert
+  # notify:
+  #   - restart elastalert
 
 - name: Install elastalert config
   template:
