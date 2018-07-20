@@ -1,11 +1,11 @@
 [Unit]
 Description=elastalert
-After=multi-user.target
+After=elasticsearch.service
 
 [Service]
 Type=simple
 WorkingDirectory=/etc/elastalert
-ExecStart=/opt/elastalert/venv/bin/elastalert
+ExecStart=/opt/elastalert/venv/bin/elastalert --verbose --config /etc/elastalert/config.yaml
 User={{ elastalert_user }}
 
 [Install]

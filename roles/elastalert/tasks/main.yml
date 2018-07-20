@@ -1,4 +1,11 @@
 ---
+- name: Create virtualenv directory
+  file:
+    path: "/opt/elastalert"
+    owner: "{{ elastalert_user }}"
+    group: "{{ elastalert_group }}"
+    state: directory
+
 - name: Clone elastalert repository
   git:
     repo: https://github.com/Yelp/elastalert.git
@@ -23,7 +30,18 @@
   pip:
     name: virtualenv
 
-- name: Install setup tools
+# - name: Establish venv and ensure pip is at latest version
+#   pip:
+#     name: "{{ item }}"
+#     state: latest
+#     virtualenv: "/opt/elastalert/venv"
+#   become: yes
+#   become_user: "{{ elastalert_user }}"
+#   with_items:
+#     - pip
+#     - setuptools
+
+- name: Install setuptools
   pip:
     name: "setuptools>=11.3"
 
@@ -46,40 +64,50 @@
   pip:
     name: "elasticsearch>=6.3.0"
 
+- name: Ensure etc directory is created
+  file:
+    path: "/etc/elastalert"
+    state: directory
 
-#
-#
-# - name: Ensure pre-reqs installed
-#   package:
-#     name: "{{ item }}"
-#   with_items:
-#       - virtualenv
-#       - python-dev
-#       - gcc
-#       - libssl-dev
-#
-# - name: Ensure etc directory is created
-#   file:
-#     path: "/etc/elastalert"
-#     state: directory
-#
-# - name: Create virtualenv root directory
-#   file:
-#     path: "/opt/elastalert"
-#     owner: "{{ elastalert_user }}"
-#     group: "{{ elastalert_group }}"
-#     state: directory
-#
-# - name: Establish venv and ensure pip is at latest version
-#   pip:
-#     name: "{{ item }}"
-#     state: latest
-#     virtualenv: "/opt/elastalert/venv"
-#   become: yes
-#   become_user: "{{ elastalert_user }}"
-#   with_items:
-#     - pip
-#     - setuptools
+- name: Create rules directory
+  file:
+    path: /etc/elastalert/rules
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+    - restart elastalert
+
+- name: Install elastalert config
+  template:
+    src: templates/elastalert/config.yaml.j2
+    dest: "/etc/elastalert/config.yaml"
+
+- name: Copy rules
+  template:
+    src: "templates/elastalert/{{ item }}.yaml.j2"
+    dest: "/etc/elastalert/rules/{{ item }}.yaml"
+  with_items:
+    - test
+
+# - name: Install systemd unit file
+#   template:
+#     src: templates/elastalert/elastalert-systemd.service.j2
+#     dest: /lib/systemd/system/elastalert.service
+#     owner: root
+#     group: root
+#   notify:
+#     - restart elastalert
+
+# - name: Enable elastalert at startup
+#   service:
+#     name: elastalert
+#     state: started
+#     enabled: yes
+
+
+
 #
 # - name: Install elastalert into virtualenv
 #   pip:
@@ -88,7 +116,7 @@
 #     virtualenv: "/opt/elastalert/venv"
 #   become_user: "{{ elastalert_user }}"
 #   become: yes
-#
+
 # - name: Install systemd unit file
 #   template:
 #     src: templates/elastalert/elastalert-systemd.service.j2
@@ -98,34 +126,26 @@
 #   notify: reload systemd
 #   tags: systemd
 #
-# - name: Install elastalert config
-#   template:
-#     src: templates/elastalert/config.yaml.j2
-#     dest: "/etc/elastalert/config.yaml"
+#
 #   tags: systemd
 #   notify: restart elastalert
-#
-#     # - name: Check for existing elastalert index
-#     #   uri:
-#     #     url: "{{ elastalert_es_url }}/elastalert"
-#     #     method: HEAD
-#     #     status_code: 200
-#     #   register: elastalert_index_result
-#     #   changed_when: false
-#     #   ignore_errors: yes
-#     #
-#     # - name: Create index
-#     #   command: "/opt/elastalert/venv/bin/elastalert-create-index --config /etc/elastalert/config.yaml --index {{ elastalert_es_writeback_index }} --old-index ''"
-#     #   when: elastalert_index_result|failed
-#     #   become_user: "{{ elastalert_user }}"
-#     #   become: yes
-#
-# - name: Create rules folder
-#   file:
-#     path: "/etc/elastalert/rules"
-#     owner: root
-#     group: root
-#     state: directory
+
+    # - name: Check for existing elastalert index
+    #   uri:
+    #     url: "{{ elastalert_es_url }}/elastalert"
+    #     method: HEAD
+    #     status_code: 200
+    #   register: elastalert_index_result
+    #   changed_when: false
+    #   ignore_errors: yes
+    #
+    # - name: Create index
+    #   command: "/opt/elastalert/venv/bin/elastalert-create-index --config /etc/elastalert/config.yaml --index {{ elastalert_es_writeback_index }} --old-index ''"
+    #   when: elastalert_index_result|failed
+    #   become_user: "{{ elastalert_user }}"
+    #   become: yes
+
+
 #
 # - name: Copy over rules from templates
 #   template:
