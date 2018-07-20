@@ -3,7 +3,7 @@
 - name: Avoid errors that result from InsecurePlatformWarning
   apt:
     name: "{{ item }}"
-    dest: /tmp
+    dest: /tmp/
   with_items:
     - software-properties-common
     - python
