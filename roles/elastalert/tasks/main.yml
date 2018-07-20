@@ -1,13 +1,8 @@
 ---
-
-- name: Install virtualenv
-  pip:
-    name: virtualenv
-
 - name: Avoid errors that result from InsecurePlatformWarning
   apt:
     name: "{{ item }}"
-    dest: /tmp/
+    # dest: /tmp/
   with_items:
     - software-properties-common
     - python
@@ -18,6 +13,11 @@
   tags:
     - apt
 
+
+
+- name: Install virtualenv
+  pip:
+    name: virtualenv
 
 
 
