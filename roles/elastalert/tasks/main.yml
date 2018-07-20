@@ -27,8 +27,18 @@
   pip:
     name: "setuptools>=11.3"
 
+- name: Install six 1.9.0
+  pip:
+    name: six==1.9.0
+    virtualenv: /opt/elastalert/venv
+
+- name: Install elastalert dependencies
+  pip:
+    requirements: /opt/elastalert/requirements.txt
+    virtualenv: /opt/elastalert/venv
+
 - name: Install elastalert
-  command: sudo /opt/elastalert python setup.py install
+  command: /opt/elastalert/venv/bin/python setup.py install
   args:
     chdir: /opt/elastalert
 
