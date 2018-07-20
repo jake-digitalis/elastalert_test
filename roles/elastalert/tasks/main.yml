@@ -28,7 +28,7 @@
     name: "setuptools>=11.3"
 
 - name: Install elastalert
-  command: /opt/elastalert python setup.py install
+  command: /opt/elastalert/python setup.py install
   args:
     chdir: /opt/elastalert
 
