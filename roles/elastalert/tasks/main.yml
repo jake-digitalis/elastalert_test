@@ -72,14 +72,14 @@
 
 - name: Process rules
   template:
-    src: "{{ item }}.j2"
+    src: "templates/elastalert/{{ item }}.j2"
     dest: "/etc/elastalert/rules/{{ item }}"
   with_items:
     - test.yaml
 
 - name: Process config template
   template:
-    src: templates/config.yaml.j2
+    src: templates/elastalert/config.yaml.j2
     dest: /etc/elastalert/config.yaml
 
 # - name: add elastalert init script
