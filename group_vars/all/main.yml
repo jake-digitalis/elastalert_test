@@ -11,7 +11,6 @@ elastalert_es_ssl: false
 elastalert_es_verifycerts: false
 elastalert_es_host: localhost
 elastalert_es_port: 9200
-elastalert_es_writeback_index: elastalert_status
 elastalert_es_url: "http{{ 's' if elastalert_es_ssl else '' }}://{{ elastalert_es_host }}:{{ elastalert_es_port }}"
 elastalert_es_run_every:
   minutes: 5
