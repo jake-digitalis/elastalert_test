@@ -15,13 +15,6 @@ elastalert_es_url: "http{{ 's' if elastalert_es_ssl else '' }}://{{ elastalert_e
 elastalert_es_run_every:
   minutes: 5
 
-# System pkg dependencies
-elastalert_pkgs:
-  - virtualenv
-  - python-dev
-  - gcc
-  - libssl-dev
-
 # System installation settings
 elastalert_user: elastalert
 elastalert_group: elastalert
