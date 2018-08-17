@@ -4,96 +4,96 @@
     repo: https://github.com/Yelp/elastalert.git --branch v0.1.30
     accept_hostkey: yes
     dest: /opt/elastalert
-    # version: "{{ elastalert_version }}"
+    version: "{{ elastalert_version }}"
 
-# - name: Install virtualenv
-#   pip:
-#     name: virtualenv
-#
-# - name: Avoid errors that result from InsecurePlatformWarning
-#   apt:
-#     name: "{{ item }}"
-#   with_items:
-#     - python-dev
-#     - libffi-dev
-#     - libssl-dev
-#   tags:
-#     - apt
-#
-# - name: Install six 1.9.0
-#   pip:
-#     name: six==1.9.0
-#     virtualenv: /opt/elastalert/venv
-#
-# - name: Install elastalert dependencies
-#   pip:
-#     requirements: /opt/elastalert/requirements.txt
-#     virtualenv: /opt/elastalert/venv
-#
-# - name: Install elastalert
-#   command: /opt/elastalert/venv/bin/python setup.py install
-#   args:
-#     chdir: /opt/elastalert
-#
-# - name: Flush handlers to ensure a local elasticsearch has been started
-#   meta: flush_handlers
-#
-# - name: Install httplib2
-#   pip:
-#     name: httplib2
-#
-# - name: Check existence of elastalert metadata index
-#   uri:
-#     url: "http://{{ elastalert_es_host }}:{{ elastalert_es_port }}/{{ elastalert_es_writeback_index }}"
-#     method: HEAD
-#     status_code:
-#       - 200
-#       - 404
-#   register: elastalert_index_check
-#
-# - name: Create elasticsearch index for elastalert metadata
-#   command: /opt/elastalert/venv/bin/elastalert-create-index --host "{{ elastalert_es_host }}" --port "{{ elastalert_es_port }}" --no-auth --no-ssl --url-prefix "" --index "{{ elastalert_es_writeback_index }}" --old-index ""
-#   args:
-#     chdir: /opt/elastalert
-#   when: elastalert_index_check.status == 404
-#   notify:
-#     - restart elastalert
-#
-#
-# - name: Create rules directory
-#   file:
-#     path: /etc/elastalert/rules
-#     state: directory
-#     owner: root
-#     group: root
-#     mode: 0755
-#   notify:
-#     - restart elastalert
-#
-# - name: Process rules
-#   template:
-#     src: "templates/elastalert/{{ item }}.j2"
-#     dest: "/etc/elastalert/rules/{{ item }}"
-#   with_items:
-#     - test.yaml
-#
-# - name: Process config template
-#   template:
-#     src: templates/elastalert/config.yaml.j2
-#     dest: /etc/elastalert/config.yaml
-#
-# - name: Install systemd unit file
-#   template:
-#     src: templates/elastalert/elastalert-systemd.service.j2
-#     dest: /lib/systemd/system/elastalert.service
-#     owner: root
-#     group: root
-#   notify: reload systemd
-#   tags:
-#     - systemd
-#
-# - name: Enable elastalert at startup
-#   service:
-#     name: elastalert
-#     state: started
-#     enabled: yes
+- name: Install virtualenv
+  pip:
+    name: virtualenv
+
+- name: Avoid errors that result from InsecurePlatformWarning
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - python-dev
+    - libffi-dev
+    - libssl-dev
+  tags:
+    - apt
+
+- name: Install six 1.9.0
+  pip:
+    name: six==1.9.0
+    virtualenv: /opt/elastalert/venv
+
+- name: Install elastalert dependencies
+  pip:
+    requirements: /opt/elastalert/requirements.txt
+    virtualenv: /opt/elastalert/venv
+
+- name: Install elastalert
+  command: /opt/elastalert/venv/bin/python setup.py install
+  args:
+    chdir: /opt/elastalert
+
+- name: Flush handlers to ensure a local elasticsearch has been started
+  meta: flush_handlers
+
+- name: Install httplib2
+  pip:
+    name: httplib2
+
+- name: Check existence of elastalert metadata index
+  uri:
+    url: "http://{{ elastalert_es_host }}:{{ elastalert_es_port }}/{{ elastalert_es_writeback_index }}"
+    method: HEAD
+    status_code:
+      - 200
+      - 404
+  register: elastalert_index_check
+
+- name: Create elasticsearch index for elastalert metadata
+  command: /opt/elastalert/venv/bin/elastalert-create-index --host "{{ elastalert_es_host }}" --port "{{ elastalert_es_port }}" --no-auth --no-ssl --url-prefix "" --index "{{ elastalert_es_writeback_index }}" --old-index ""
+  args:
+    chdir: /opt/elastalert
+  when: elastalert_index_check.status == 404
+  notify:
+    - restart elastalert
+
+
+- name: Create rules directory
+  file:
+    path: /etc/elastalert/rules
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+    - restart elastalert
+
+- name: Process rules
+  template:
+    src: "templates/elastalert/{{ item }}.j2"
+    dest: "/etc/elastalert/rules/{{ item }}"
+  with_items:
+    - test.yaml
+
+- name: Process config template
+  template:
+    src: templates/elastalert/config.yaml.j2
+    dest: /etc/elastalert/config.yaml
+
+- name: Install systemd unit file
+  template:
+    src: templates/elastalert/elastalert-systemd.service.j2
+    dest: /lib/systemd/system/elastalert.service
+    owner: root
+    group: root
+  notify: reload systemd
+  tags:
+    - systemd
+
+- name: Enable elastalert at startup
+  service:
+    name: elastalert
+    state: started
+    enabled: yes
