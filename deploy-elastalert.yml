@@ -12,5 +12,5 @@
       user: name="{{ elastalert_user }}" shell=/bin/bash groups="{{ elastalert_group }}" append=yes
 
   roles:
-    - oracle-jdk
+    # - oracle-jdk
     - elastalert
